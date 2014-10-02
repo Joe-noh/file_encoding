@@ -1,0 +1,2 @@
+defmodule FileEncoding do
+end
