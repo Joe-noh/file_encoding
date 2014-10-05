@@ -1,29 +1,33 @@
 defmodule FileEncodingTest do
   use ExUnit.Case
 
-  @dir "test/test_files/"
+  import TestHelper
 
   test "UTF-8" do
-    assert FileEncoding.judge(@dir <> "utf8.txt") == :utf8
+    assert_encoding("utf8.txt", :utf8)
   end
 
   test "UTF-8 with BOM" do
-    assert FileEncoding.judge(@dir <> "utf8-bom.txt") == :utf8
+    assert_encoding("utf8-bom.txt", :utf8)
   end
 
   test "EUC-JP" do
-    assert FileEncoding.judge(@dir <> "eucjp.txt") == :eucjp
+    assert_encoding("eucjp.txt", :eucjp)
   end
 
   test "Shift_JIS" do
-    assert FileEncoding.judge(@dir <> "sjis.txt") == :sjis
+    assert_encoding("sjis.txt", :sjis)
   end
 
   test "binary" do
-    assert FileEncoding.judge(@dir <> "binary") == :binary
+    assert_encoding("binary", :binary)
   end
 
   test "ascii" do
-    assert FileEncoding.judge(@dir <> "ascii.txt") == :ascii
+    assert_encoding("ascii.txt", :ascii)
+  end
+
+  test "png" do
+    assert_encoding("picture.png", :binary)
   end
 end

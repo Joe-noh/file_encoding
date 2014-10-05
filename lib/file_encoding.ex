@@ -5,20 +5,25 @@ defmodule FileEncoding do
     filepath
     |> File.open!([:raw, :read])  # TODO: read stats at first
     |> IO.binread(256)
-    |> do_judge(%Likelihood{})
+    |> judge(%Likelihood{})
     |> most_likely
   end
 
-  defp do_judge("", likelihood) do
+  defp judge("", likelihood) do
     likelihood
   end
 
   # UTF-8 with BOM
-  defp do_judge(<<0xEF, 0xBB, 0xBF, _ :: binary>>, _likelihood) do
+  defp judge(<<0xEF, 0xBB, 0xBF, _ :: binary>>, _) do
     :utf8
   end
 
-  defp do_judge(bytes = <<b, rest :: binary>>, likelihood) do
+  # PNG
+  defp judge(<<0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, _ :: binary>>, _) do
+    :binary
+  end
+
+  defp judge(bytes = <<b, rest :: binary>>, likelihood) do
     cond do
       b == 0x00 ->
         :binary
@@ -27,7 +32,7 @@ defmodule FileEncoding do
       (b < 0x07 or 0x0E < b) and (b < 0x20 or 0x7F < b) ->
         check_utf8_likelihood(bytes, likelihood)
       true ->
-        do_judge(rest, likelihood)
+        judge(rest, likelihood)
     end
   end
 
