@@ -26,4 +26,8 @@ defmodule FileEncodingTest do
   test "ascii" do
     assert FileEncoding.judge(@dir <> "ascii.txt") == :ascii
   end
+
+  test "png" do
+    assert FileEncoding.judge(@dir <> "picture.png") == :binary
+  end
 end

@@ -17,7 +17,7 @@ defmodule FileEncoding.Likelihood do
     %__MODULE__{lh | count: lh.count+1, binary: lh.binary + 1}
   end
 
-  def most_likely(%__MODULE__{utf8: utf, eucjp: euc, sjis: sjis, binary: bin}) do
+  def most_likely(%__MODULE__{utf8: utf, eucjp: euc, sjis: sjis}) do
     cond do
       utf + euc + sjis == 0 -> :ascii
       utf  >= euc and utf  >= sjis -> :utf8
