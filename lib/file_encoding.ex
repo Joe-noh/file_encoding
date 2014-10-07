@@ -3,7 +3,7 @@ defmodule FileEncoding do
 
   def judge(filepath) do
     filepath
-    |> File.open!([:raw, :read])  # TODO: read stats at first
+    |> File.open!([:raw, :read])
     |> IO.binread(256)
     |> judge(%Likelihood{})
     |> most_likely
@@ -11,6 +11,11 @@ defmodule FileEncoding do
 
   defp judge("", likelihood) do
     likelihood
+  end
+
+  # empty file
+  defp judge(:eof, _) do
+    :ascii
   end
 
   # UTF-8 with BOM
