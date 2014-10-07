@@ -30,4 +30,8 @@ defmodule FileEncodingTest do
   test "png" do
     assert_encoding("picture.png", :binary)
   end
+
+  test "pdf" do
+    assert_encoding("sample.pdf", :binary)
+  end
 end

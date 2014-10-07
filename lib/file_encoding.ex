@@ -23,6 +23,12 @@ defmodule FileEncoding do
     :binary
   end
 
+  # PDF
+  defp judge(<<0x25, 0x50, 0x44, 0x46, 0x2D, 0x31, 0x2E, b, _ :: binary>>, _) when
+  (0x30 <= b and b <= 0x37) do
+    :binary
+  end
+
   defp judge(bytes = <<b, rest :: binary>>, likelihood) do
     cond do
       b == 0x00 ->
