@@ -34,4 +34,8 @@ defmodule FileEncodingTest do
   test "pdf" do
     assert_encoding("sample.pdf", :binary)
   end
+
+  test "empty file" do
+    assert_encoding("empty.txt", :ascii)
+  end
 end
