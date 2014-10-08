@@ -38,4 +38,12 @@ defmodule FileEncodingTest do
   test "empty file" do
     assert_encoding("empty.txt", :ascii)
   end
+
+  test "when path of file which doesn't exist is given" do
+    assert_raise File.Error, fn ->
+      FileEncoding.judge! "does_not_exist.txt"
+    end
+
+    assert {:error, :enoent} = FileEncoding.judge("does_not_exist.txt")
+  end
 end

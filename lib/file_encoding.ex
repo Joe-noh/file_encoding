@@ -1,40 +1,52 @@
 defmodule FileEncoding do
   alias FileEncoding.Likelihood
 
-  def judge(filepath) do
+  def judge(filepath) when is_binary(filepath) do
+    case File.open(filepath, [:raw, :read]) do
+      {:ok, file} -> do_judge(file)
+      other       -> other
+    end
+  end
+
+  def judge!(filepath) when is_binary(filepath) do
     filepath
     |> File.open!([:raw, :read])
+    |> do_judge
+  end
+
+  defp do_judge(file = {:file_descriptor, _, _}) do
+    file
     |> IO.binread(256)
-    |> judge(%Likelihood{})
+    |> do_judge(%Likelihood{})
     |> most_likely
   end
 
-  defp judge("", likelihood) do
+  defp do_judge("", likelihood) do
     likelihood
   end
 
   # empty file
-  defp judge(:eof, _) do
+  defp do_judge(:eof, _) do
     :ascii
   end
 
   # UTF-8 with BOM
-  defp judge(<<0xEF, 0xBB, 0xBF, _ :: binary>>, _) do
+  defp do_judge(<<0xEF, 0xBB, 0xBF, _ :: binary>>, _) do
     :utf8
   end
 
   # PNG
-  defp judge(<<0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, _ :: binary>>, _) do
+  defp do_judge(<<0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A, _ :: binary>>, _) do
     :binary
   end
 
   # PDF
-  defp judge(<<0x25, 0x50, 0x44, 0x46, 0x2D, 0x31, 0x2E, b, _ :: binary>>, _) when
+  defp do_judge(<<0x25, 0x50, 0x44, 0x46, 0x2D, 0x31, 0x2E, b, _ :: binary>>, _) when
   (0x30 <= b and b <= 0x37) do
     :binary
   end
 
-  defp judge(bytes = <<b, rest :: binary>>, likelihood) do
+  defp do_judge(bytes = <<b, rest :: binary>>, likelihood) do
     cond do
       b == 0x00 ->
         :binary
@@ -43,7 +55,7 @@ defmodule FileEncoding do
       (b < 0x07 or 0x0E < b) and (b < 0x20 or 0x7F < b) ->
         check_utf8_likelihood(bytes, likelihood)
       true ->
-        judge(rest, likelihood)
+        do_judge(rest, likelihood)
     end
   end
 
